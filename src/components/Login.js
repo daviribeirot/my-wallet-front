@@ -1,22 +1,53 @@
 import styled from "styled-components"
 import { Link, useNavigate } from "react-router-dom";
+import {useState, useContext} from 'react'
+import { UserContext } from "../contexts/UserContext";
+import { signIn } from "../services/services";
 
 export default function Login() {
+    const [form, setForm] = useState({ email: "", password: "" });
+    const { setUser } = useContext(UserContext);
+    const navigate = useNavigate();
+
+    function handleForm(e) {
+      setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+    function handleLogin(e){
+      e.preventDefault()
+
+        signIn(form)
+            .then(res => {
+                const { idUsuario, name, email, token } = res.data;
+                setUser({ idUsuario, name, email, token });
+                localStorage.setItem("user", JSON.stringify({ idUsuario, name, email, token }));
+                navigate("/home");
+            })
+            .catch(err => {
+                alert(err.response.data);
+            })
+  }
+
+
     return (
             <Container>
                 <LoginTitle>MyWallet</LoginTitle>
 
-                <Form>
+                <Form onSubmit={handleLogin}>
                     <Input
                         type="email"
                         placeholder="Email"
                         name="email"
+                        value={form.email}
+                        onChange={handleForm}
                         required
                     />
                     <Input
                         type="password"
                         placeholder="Senha"
                         name="password"
+                        value={form.password}
+                        onChange={handleForm}
                         required
                     />
                     <button type="submit">Entrar</button>

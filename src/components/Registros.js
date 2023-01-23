@@ -1,9 +1,37 @@
 import styled from "styled-components";
+import { useState, useEffect, useContext} from "react";
+import { listTransactions } from "../services/services";
+import { UserContext } from "../contexts/UserContext";
+import Registro from "../components/Registro";
 
 export default function Registros(){
+
+  const user = useContext(UserContext)
+  const [transactions, setTransactions] = useState([]);
+  useEffect(() => {
+    const config = {
+      headers: {
+          Authorization: `Bearer ${user.user.token}`
+      }}
+      
+      listTransactions(config)
+      .then((res) => setTransactions(res.data))
+      .catch((err) => {
+        console.log(err);
+        alert("Deu alguma coisa errada");
+      })
+  }, []);
+
     return (
         <Container>
-            <h1>Não há registros de saídas!</h1>
+            {transactions.length === 0
+                    ?
+                    (<h1>Não há registros de entrada ou saída!</h1>)
+                    :
+                    <Moves>
+                        <Registro transactions={transactions} />
+                    </Moves>
+                }
         </Container>
 
     )
@@ -28,4 +56,14 @@ const Container = styled.div`
     left: 70px;
     top: 180px;
   }
+`
+const Moves = styled.div`
+  width: 326px;
+  height: 340px;
+  font-weight: 400;
+  font-size: 16px;
+  color: #000000;
+  overflow-y: scroll;
+  padding: 15px;
+  margin: 0 auto;
 `

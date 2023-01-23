@@ -1,27 +1,33 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Registros from "./Registros";
 
 export default function Home() {
+    const navigate = useNavigate();
+    const user = JSON.parse(localStorage.getItem("user"));
+
     return (
         <Container>
             <TitleContainer>
-                <h1>Olá, Fulano!</h1>
-                <ion-icon name="exit-outline"></ion-icon>
+                <h1>Olá, {user.name}</h1>
+                <ion-icon name="exit-outline" onClick={() => {
+                    localStorage.clear();
+                    navigate("/");
+                }}></ion-icon>
             </TitleContainer>
             
             <Registros />
 
             <ButtonContainer>
                 <Link to="/nova-entrada">
-                    <button className="new-record">
+                    <button>
                         <ion-icon name="add-circle-outline"></ion-icon>
                         <p>Nova <br /> entrada</p>
                     </button>
                 </Link>
 
                 <Link to="/nova-saida">
-                    <button className="new-record">
+                    <button>
                         <ion-icon name="remove-circle-outline"></ion-icon>
                         <p>Nova <br /> saída</p>
                     </button>

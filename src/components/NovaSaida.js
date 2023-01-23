@@ -1,26 +1,68 @@
 import styled from "styled-components";
+import { useState, useContext } from "react";
+import { useNavigate } from "react-router";
+import { UserContext } from "../contexts/UserContext";
+import { makeTransactions } from "../services/services";
 
 export default function NovaSaida() {
+    const [form, setForm] = useState({ value: "", description: "" });
+    const { user } = useContext(UserContext);
+    const navigate = useNavigate();
+
+    function handleForm(e) {
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
+    }
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${user.token}`
+            }
+        };
+
+        const body = {
+            ...form, value: parseInt(form.value), type: "debit"
+        }
+
+        makeTransactions(body, config)
+        .then(() => {
+            navigate("/home");
+        })
+        .catch((err) => {
+            console.log(err);
+            alert("Algo deu errado!");
+        })
+    }
+
     return (
         <Container>
             <TitleContainer>
                 <h1>Nova saida</h1>
             </TitleContainer>
 
-            <Form>
+            <Form onSubmit={handleSubmit}>
                 <input
+                    name="value"
                     placeholder="Valor"
                     type="number"
+                    value={form.value}
+                    onChange={handleForm}
                     required
                 />
 
                 <input
+                    name="description"
                     placeholder="Descrição"
+                    value={form.description}
+                    onChange={handleForm}
                     type="text"
                     required
                 />
 
-                <button>
+                <button type="submit">
                     Salvar saída
                 </button>
             </Form>

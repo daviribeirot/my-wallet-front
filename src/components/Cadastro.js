@@ -1,42 +1,70 @@
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { signUp } from "../services/services";
 
 export default function Cadastro() {
-    return (
-            <Container>
-                <LoginTitle>MyWallet</LoginTitle>
+  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const navigate = useNavigate();
 
-                <Form>
-                    <Input
-                        type="name"
-                        placeholder="Nome"
-                        name="name"
-                        required
-                    />
-                    <Input
-                        type="email"
-                        placeholder="Email"
-                        name="email"
-                        required
-                    />
-                    <Input
-                        type="password"
-                        placeholder="Senha"
-                        name="password"
-                        required
-                    />
-                    <Input
-                        type="password"
-                        placeholder="Confirme sua senha"
-                        name="password"
-                        required
-                    />
-                    <button type="submit">Cadastrar</button>
-                </Form>
+  function handleForm(e) {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
 
-                <Link to="/">Já tem uma conta? Entre agora!</Link>
-            </Container>
-    )
+  function handleSubmit(e) {
+    e.preventDefault()
+
+    signUp(form)
+      .then(res => {
+        navigate("/")
+      })
+      .catch(err => {
+        alert(err.response.data.message)
+      })
+  }
+  return (
+    <Container>
+      <LoginTitle>MyWallet</LoginTitle>
+
+      <Form onSubmit={handleSubmit}>
+        <Input
+          type="name"
+          placeholder="Nome"
+          name="name"
+          value={form.name}
+          onChange={handleForm}
+          required
+        />
+        <Input
+          type="email"
+          placeholder="Email"
+          name="email"
+          value={form.email}
+          onChange={handleForm}
+          required
+        />
+        <Input
+          type="password"
+          placeholder="Senha"
+          name="password"
+          value={form.password}
+          onChange={handleForm}
+          required
+        />
+        <Input
+          type="password"
+          placeholder="Confirme sua senha"
+          name="confirmPassword"
+          value={form.confirmPassword}
+          onChange={handleForm}
+          required
+        />
+        <button type="submit">Cadastrar</button>
+      </Form>
+
+      <Link to="/">Já tem uma conta? Entre agora!</Link>
+    </Container>
+  )
 }
 
 const Container = styled.div`
